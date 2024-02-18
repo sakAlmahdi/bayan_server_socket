@@ -1,0 +1,10 @@
+{
+  "cSpell.words": ["Getx"],
+  "window.titleBarStyle": "custom",
+  "workbench.colorCustomizations": {
+     "[Default Dark+]": {
+         "titleBar.activeBackground": "#ffffffcc",
+         "titleBar.activeForeground":"#000000",
+     },
+ },
+}
