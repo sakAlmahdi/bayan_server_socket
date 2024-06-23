@@ -16,7 +16,11 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf.dart' as shelf;
 
 typedef Handler = FutureOr<shelf.Response> Function(Request request);
+// typedef OnServerStop = FutureOr<bool> Function();
+// typedef OnServerStart = FutureOr<bool> Function();
+
 SocketController? controller;
+Timer? _timer;
 
 class BayanSocketServer {
   static start({
@@ -27,6 +31,7 @@ class BayanSocketServer {
         setResponse,
     required Handler handler,
     int? port,
+    Function(bool value)? serverStatus,
   }) {
     print("startttttttttt:");
     controller = Get.put(
@@ -36,6 +41,7 @@ class BayanSocketServer {
           userId: userId,
           setResponse: setResponse,
           port: port,
+          serverStatus: serverStatus,
         ),
         permanent: true);
     controller?.startShelfServer(handler);
@@ -46,6 +52,10 @@ class BayanSocketServer {
       print("${message.toString()}");
       print("stop");
       stop();
+    });
+
+    _timer = Timer(const Duration(seconds: 5), () {
+      controller?.restartIfIsEmpty();
     });
 
     return BayanSocketServer();
