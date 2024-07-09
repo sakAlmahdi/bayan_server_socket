@@ -9,7 +9,9 @@ environment:
 
 dependencies:
   bayan_pos_core:
-    path: /Users/engsakher/AndroidStudioProjects/bayan_pos_core
+    git:
+      url: git@github.com:sakAlmahdi/bayan_pos_core.git
+      ref: main
   connectivity_plus: ^5.0.2
   flutter:
     sdk: flutter
@@ -32,7 +34,6 @@ dependency_overrides:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
 flutter: null
-
 # To add assets to your package, add an assets section, like this:
 # assets:
 #   - images/a_dot_burr.jpeg
