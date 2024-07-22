@@ -10,8 +10,8 @@ environment:
 dependencies:
   bayan_pos_core:
     git:
-      url: git@github.com:sakAlmahdi/bayan_pos_core.git
-      ref: main
+      url: https://github.com/sakAlmahdi/bayan_pos_core.git
+
   connectivity_plus: ^5.0.2
   flutter:
     sdk: flutter
