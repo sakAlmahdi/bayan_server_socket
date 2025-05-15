@@ -7,6 +7,7 @@ import 'package:bayan_pos_core/data/model/socket/socket.dart';
 import 'package:bayan_pos_core/data/model/socket/socket_request.dart';
 import 'package:bayan_socket_server/core/halpers/base_network_helper.dart';
 import 'package:bayan_socket_server/src/socket_event_mangment.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -25,6 +26,7 @@ class SocketController extends GetxController {
     this.port,
     required this.setResponse,
     this.serverStatus,
+    this.keepLiveByPingDuration,
   });
   int? port;
   bool isStartMaster = false;
@@ -56,6 +58,8 @@ class SocketController extends GetxController {
 
   Function(bool value)? serverStatus;
 
+  Duration? keepLiveByPingDuration;
+
   @override
   Future<void> onInit() async {
     super.onInit();
@@ -76,48 +80,98 @@ class SocketController extends GetxController {
     });
   }
 
+  // makeMeServerOnShelf() async {
+  //   print("createIpAndPort");
+  //   await createIpAndPort();
+  //   print("listenToNSD");
+  //   try {
+  //     await listenToNSD();
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  //   print("subscripToNSD");
+  //   try {
+  //     await subscripToNSD();
+  //   } catch (e) {}
+  //   print("server");
+  //   // if (server.)
+  //   try {
+  //     // await server?.close();
+  //     // var handler =
+  //     //     const Pipeline().addMiddleware(logRequests()).addHandler(_echoRequest);
+
+  //     server = await shelf_io.serve(
+  //       handler!.call,
+  //       masterServerSubscriberInfo!.ip!,
+  //       masterServerSubscriberInfo!.port!,
+  //       // 0,
+  //       shared: true,
+  //     );
+
+  //     masterServerSubscriberInfo?.port = server?.port;
+  //     server?.autoCompress = true;
+
+  //     server?.idleTimeout = null;
+  //     server?.sessionTimeout = 86400 * 30;
+
+  //     if (server != null) return;
+
+  //     // Enable content compression
+
+  //     print('Serving at http://${server?.address.host}:${server?.port}');
+  //   } catch (e) {
+  //     print("BAYAN ERROR : ${e.toString()}");
+  //   }
+  // }
   makeMeServerOnShelf() async {
-    print("createIpAndPort");
+    print("🛠 createIpAndPort");
     await createIpAndPort();
-    print("listenToNSD");
+
+    print("🔍 listenToNSD");
     try {
       await listenToNSD();
     } catch (e) {
-      print(e.toString());
+      print("❌ NSD Listen Error: $e");
     }
-    print("subscripToNSD");
+
+    print("📡 subscripToNSD");
     try {
       await subscripToNSD();
-    } catch (e) {}
-    print("server");
-    // if (server.)
-    try {
-      // await server?.close();
-      // var handler =
-      //     const Pipeline().addMiddleware(logRequests()).addHandler(_echoRequest);
+    } catch (e) {
+      print("❌ NSD Subscription Error: $e");
+    }
 
+    print("🚀 Starting Shelf Server...");
+
+    try {
+      // إغلاق السيرفر القديم إذا موجود
+      await server?.close(force: true);
+
+      // تشغيل السيرفر
       server = await shelf_io.serve(
         handler!.call,
         masterServerSubscriberInfo!.ip!,
         masterServerSubscriberInfo!.port!,
-        // 0,
         shared: true,
       );
 
+      // تفعيل إعدادات السيرفر
+      server!.autoCompress = true;
+      server!.idleTimeout = null; // ❗️مهم جدًا - يمنع انقطاع السيرفر بعد الخمول
+      // server!.sessionTimeout = 86400 * 30; // جلسة طويلة جدًا
+
       masterServerSubscriberInfo?.port = server?.port;
 
-      if (server != null) return;
-
-      // Enable content compression
-      server?.autoCompress = true;
-
-      server?.idleTimeout = null;
-      server?.sessionTimeout = 86400 * 30;
-
-      print('Serving at http://${server?.address.host}:${server?.port}');
+      print(
+          '✅ Server running at http://${server!.address.host}:${server!.port}');
     } catch (e) {
-      print("BAYAN ERROR : ${e.toString()}");
+      print("❌ Server Startup Error: $e");
     }
+
+    // لوج دوري للتأكد أن السيرفر حي
+    Timer.periodic(Duration(minutes: 1), (_) {
+      print("✅ Server heartbeat: ${DateTime.now()}");
+    });
   }
 
   shelf.Response _echoRequest(Request request) =>
@@ -139,6 +193,24 @@ class SocketController extends GetxController {
         discovery?.dispose();
       }
     });
+    if (keepLiveByPingDuration != null) {
+      Timer.periodic(keepLiveByPingDuration!, (timer) async {
+        String? ip = masterServerSubscriberInfo?.ip;
+        try {
+          Dio dio = Dio();
+          print("START-PING TO $ip:$port  ON ${DateTime.now()}");
+
+          var data = await dio.get("http://$ip:$port/ping");
+          if (data.statusCode != 200) {
+            throw data.statusMessage ?? '';
+          }
+          print("Done-PING TO $ip:$port ON ${DateTime.now()}");
+        } catch (e) {
+          print("Error-PING TO $ip:$port ON ${DateTime.now()}");
+          await restart();
+        }
+      });
+    }
   }
 
   restart() async {

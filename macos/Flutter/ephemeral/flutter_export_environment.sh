@@ -1,6 +1,6 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/engsakher/dev/flutter"
+export "FLUTTER_ROOT=/Users/engsakher/fvm/versions/3.16.9"
 export "FLUTTER_APPLICATION_PATH=/Users/engsakher/AndroidStudioProjects/bayan_socket_server"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"

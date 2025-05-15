@@ -22,6 +22,7 @@ dependencies:
   shelf: ^1.4.1
   shelf_plus: ^1.7.0
   shelf_router: ^1.1.4
+  dio: ^5.3.2
 
 dev_dependencies:
   flutter_lints: ^2.0.0

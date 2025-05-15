@@ -32,6 +32,7 @@ class BayanSocketServer {
     required Handler handler,
     int? port,
     Function(bool value)? serverStatus,
+    Duration? keepLiveByPingDuration,
   }) {
     print("startttttttttt:");
     controller = Get.put(
@@ -42,6 +43,7 @@ class BayanSocketServer {
           setResponse: setResponse,
           port: port,
           serverStatus: serverStatus,
+          keepLiveByPingDuration: keepLiveByPingDuration,
         ),
         permanent: true);
     controller?.startShelfServer(handler);
@@ -67,6 +69,7 @@ class BayanSocketServer {
       {required Future<BaseSocketResponse>? Function(BaseSocketRequest request)
           setResponse}) async {
     var server = await ServerSocket.bind("192.168.0.96", 12345);
+
     server.listen((event) {
       SocketEventMangment.lisenToServerEvents(event, setResponse: setResponse);
     });
