@@ -193,6 +193,7 @@ class SocketController extends GetxController {
         discovery?.dispose();
       }
     });
+    print("keepLiveByPingDuration : ${keepLiveByPingDuration?.inSeconds}");
     if (keepLiveByPingDuration != null) {
       Timer.periodic(keepLiveByPingDuration!, (timer) async {
         String? ip = masterServerSubscriberInfo?.ip;
