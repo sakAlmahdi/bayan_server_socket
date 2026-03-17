@@ -9,15 +9,14 @@ environment:
 
 dependencies:
   bayan_pos_core:
-    git:
-      url: https://github.com/sakAlmahdi/bayan_pos_core.git
+    path: ../bayan_pos_core
 
-  connectivity_plus: ^5.0.2
+  connectivity_plus: ^7.0.0
   flutter:
     sdk: flutter
-  get: ^4.6.1
+  get: ^4.6.6
   http: null
-  network_info_plus: ^4.1.0
+  network_info_plus: ^7.0.0
   nsd: ^3.0.0
   shelf: ^1.4.1
   shelf_plus: ^1.7.0
@@ -31,6 +30,7 @@ dev_dependencies:
 
 dependency_overrides:
   collection: ^1.18.0
+  uuid: ^4.2.1
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.

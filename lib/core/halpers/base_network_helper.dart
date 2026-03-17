@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 class BaseNetworkHelper extends GetxService {
   final isHasConnectionToNetwork = false.obs;
-  late StreamSubscription<ConnectivityResult> subscription;
+  late StreamSubscription<List<ConnectivityResult>> subscription;
   @override
   void onInit() async {
     super.onInit();
@@ -18,16 +18,15 @@ class BaseNetworkHelper extends GetxService {
     checkConnectivityResult(connectivityResult);
   }
 
-  checkConnection() async => subscription = Connectivity()
-      .onConnectivityChanged
-      .listen((ConnectivityResult result) => checkConnectivityResult(result));
+  checkConnection() async =>
+      subscription = Connectivity().onConnectivityChanged.listen(
+          (List<ConnectivityResult> result) => checkConnectivityResult(result));
 
-  checkConnectivityResult(ConnectivityResult result) {
-    if ([
-      ConnectivityResult.wifi,
-      ConnectivityResult.ethernet,
-      ConnectivityResult.vpn
-    ].contains(result)) {
+  checkConnectivityResult(List<ConnectivityResult> result) {
+    if (result.contains(ConnectivityResult.wifi) ||
+        result.contains(ConnectivityResult.mobile) ||
+        result.contains(ConnectivityResult.ethernet) ||
+        result.contains(ConnectivityResult.vpn)) {
       isHasConnectionToNetwork.value = true;
     } else {
       isHasConnectionToNetwork.value = false;
