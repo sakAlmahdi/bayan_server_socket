@@ -254,19 +254,27 @@ class SocketController extends GetxController {
 
   createIpAndPort() async {
     String? wifiIP;
+    int retryCount = 0;
 
     do {
+      print("📡 [SOCKET-CTRL] Attempting to get WiFi IP... (retry: $retryCount)");
       wifiIP = await infoNetwork.getWifiIP();
+      if (wifiIP == null) {
+        await Future.delayed(const Duration(seconds: 1));
+        retryCount++;
+        print("⏳ [SOCKET-CTRL] Waiting for WiFi IP... retry: $retryCount");
+      }
+      if (retryCount > 30) {
+        print("🚫 [SOCKET-CTRL] WiFi IP retrieval TIMEOUT after 30 attempts.");
+        break; // Timeout after 30 seconds
+      }
     } while (wifiIP == null);
+    
+    print("✅ [SOCKET-CTRL] WiFi IP: $wifiIP");
 
-    // final random = Random();
-    // final port = random.nextInt(
-    //   65536,
-    // );
     int port = randomPort();
     masterServerSubscriberInfo = SocketSubscriberInfo(
       imei: deviceId,
-      // port: 1996,
       port: port,
       ip: wifiIP,
     );

@@ -49,6 +49,7 @@ class BayanSocketServer {
     controller?.startShelfServer(handler);
     ReceivePort receivePort = ReceivePort();
 
+    IsolateNameServer.removePortNameMapping('bayan');
     IsolateNameServer.registerPortWithName(receivePort.sendPort, 'bayan');
     receivePort.listen((message) {
       print("${message.toString()}");
